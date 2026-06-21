@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mspeed Internet - WOL System</title>
+    <style>
+        body { background-color: #121212; color: #fff; font-family: sans-serif; text-align: center; padding: 20px; }
+        h1 { color: #ff3333; }
+        .container { max-width: 500px; margin: auto; background: #1e1e1e; padding: 20px; border-radius: 10px; border: 1px solid #333; }
+        .btn { background: #ff3333; color: white; border: none; padding: 10px 20px; font-size: 16px; border-radius: 5px; cursor: pointer; margin: 5px; transition: 0.3s; }
+        .btn:hover { background: #cc0000; }
+        textarea, input { width: 90%; padding: 10px; margin: 10px 0; border-radius: 5px; border: 1px solid #444; background: #2a2a2a; color: white; }
+    </style>
+</head>
+<body>
+
+    <h1>🖥️ Mspeed LAN Control</h1>
+    <div class="container">
+        <h3>สั่งเปิดเครื่องคอมพิวเตอร์</h3>
+        <button class="btn" onclick="wakeUp('PC01')">เปิดเครื่อง PC 01</button>
+        <button class="btn" onclick="wakeUp('PC02')">เปิดเครื่อง PC 02</button>
+        <button class="btn" onclick="wakeUp('PC03')">เปิดเครื่อง PC 03</button>
+        
+        <hr style="border-color: #333; margin: 20px 0;">
+
+        <h3>💬 ติดต่อแอดมิน / แจ้งปัญหา</h3>
+        <input type="text" id="pcNumber" placeholder="จากเครื่องคอมหมายเลขอะไร...">
+        <textarea id="adminMessage" rows="4" placeholder="พิมพ์ข้อความที่ต้องการแจ้งแอดมิน..."></textarea>
+        <button class="btn" style="background: #333; border: 1px solid #ff3333;" onclick="sendMessage()">ส่งข้อความ</button>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000/api'; // เปลี่ยน localhost เป็น IP เครื่องเซิร์ฟเวอร์ในวงแลน
+
+        function wakeUp(pcName) {
+            fetch(`${API_URL}/wakeup`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ pcName })
+            })
+            .then(res => res.json())
+            .then(data => alert(data.message))
+            .catch(err => alert('เชื่อมต่อเซิร์ฟเวอร์ล้มเหลว'));
+        }
+
+        function sendMessage() {
+            const pcNumber = document.getElementById('pcNumber').value;
+            const message = document.getElementById('adminMessage').value;
+
+            fetch(`${API_URL}/contact-admin`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ pcNumber, message })
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert(data.message);
+                document.getElementById('adminMessage').value = '';
+            })
+            .catch(err => alert('ส่งข้อความล้มเหลว'));
+        }
+    </script>
+</body>
+</html>
